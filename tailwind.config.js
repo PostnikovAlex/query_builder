@@ -1,0 +1,78 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
+  theme: {
+    colors: {
+      transparent: 'transparent',
+      disabled: '#E6E6E6',
+      background: '#F5F5F5',
+      white: '#FFFFFF',
+      main: '#343434',
+      'gray-dark': '#585858',
+      'gray-light': '#C6C6C6',
+      'gray-600': '#9C9C9C',
+      'gray-medium': '#9C9C9C',
+      'gray-500': '#F9F9F9',
+      alert: 'rgb(255, 219, 220)',
+      'blue-dark': '#190881',
+      'blue-light': '#33296D',
+    },
+    fontFamily: {
+      serif: ['var(--font), sans-serif'],
+    },
+    fontSize: {
+      h1: '22px',
+      h2: '18px',
+      body1: '17px',
+      body2: '15px',
+    },
+    fontWeight: {
+      bold: '600',
+      regular: '400',
+      medium: '500',
+    },
+    lineHeight: {
+      h1: '27px',
+      h2: 'normal',
+      body1: 'normal',
+      body2: '22px',
+      body3: '22px',
+      body4: '15px',
+      small: 'normal',
+      status: '20px',
+    },
+    extend: {
+      borderRadius: {
+        1: '5px',
+        2: '10px',
+      },
+      borderWidth: {
+        1: '1px',
+        2: '2px',
+      },
+      spacing: {
+        0.5: '4px',
+        1: '8px',
+        1.5: '12px',
+        2: '16px',
+        2.5: '20px',
+        3: '24px',
+        3.5: '28px',
+        4: '32px',
+        4.5: '36px',
+        5: '40px',
+        5.5: '44px',
+        6: '48px',
+        6.5: '52px',
+        7: '56px',
+        7.5: '60px',
+        8: '64px',
+        8.5: '68px',
+        9: '72px',
+        9.5: '76px',
+        10: '80px',
+      },
+    },
+  },
+
+}
