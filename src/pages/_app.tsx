@@ -2,8 +2,11 @@ import { ReactElement, ReactNode, Suspense } from 'react'
 import { type AppProps } from 'next/app'
 import type { NextPage } from 'next'
 import classNames from 'classnames'
-import { Inter } from 'next/font/google'
 
+import store from '@/store/store';
+import { Provider } from 'react-redux';
+
+import { Inter } from 'next/font/google'
 import '../styles/globals.css'
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
@@ -20,8 +23,12 @@ export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? ((page) => page)
 
   return (
-    <div className={classNames(inter.variable, 'h-full')}>
-      {getLayout(<Component {...pageProps} />)}
-    </div>
+      <div className={classNames(inter.variable, 'h-full')}>
+        {getLayout(
+          <Provider store={store}>
+            <Component {...pageProps} />
+          </Provider>
+          )}
+      </div>
   )
 }

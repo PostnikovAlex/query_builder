@@ -17,6 +17,7 @@ type DropdownProps = {
   onValueChange: (value: string) => void
   name: string
   items: Array<DropdownItemProps>
+  relatedEntityList: Array<DropdownItemProps>
   placeholder?: string
   variant?: 'borderless' | 'normal'
   size?: 'medium' | 'big'
@@ -31,6 +32,7 @@ const Dropdown = ({
   onValueChange,
   name,
   items,
+  relatedEntityList,
   placeholder,
   variant,
   size,
@@ -41,6 +43,15 @@ const Dropdown = ({
   disabled,
   ...otherProps
 }: DropdownProps) => {
+  const handleSelect = (selectedOption) => {
+    if ('EntityId' in selectedOption) {
+      // it's a related entity
+      onValueChange(selectedOption || null)
+    } else {
+      // It's a field
+      onValueChange(selectedOption?.value || null)
+    }
+  }
   const rootClasses = classNames(
     'flex flex-row justify-between select-none hover:shadow-accent',
     variant === 'borderless' ? '' : 'border border-stroke rounded-1',
@@ -51,14 +62,14 @@ const Dropdown = ({
   )
 
   const selectedOption = items.find((item) => item.value === value)
-
+  
   return (
     <Select.Root
       disabled={disabled}
       placeholder={placeholder}
       name={name}
       value={selectedOption}
-      onValueChange={(selectedOption) => onValueChange(selectedOption?.value || null)}
+      onValueChange={(selectedOption) => handleSelect(selectedOption)}
 
     >
       <Select.Trigger
@@ -79,26 +90,46 @@ const Dropdown = ({
           position="popper"
         >
           <Select.Viewport>
-            <ScrollArea.Root type="auto">
+            <ScrollArea.Root >
               <ScrollArea.Viewport>
                 <Select.Group>
-                  {items.map((item, index) => (
-                    <Select.Item
-                      className={classNames(
-                        getTypographyClassNames('body3'),
-                        'flex items-center px-2 h-[40px] bg-white text-maim mb-1 cursor-pointer hover:border-transparent outline-none rounded-[3px] last:mb-0',
-                        'hover:bg-pink-light',
-                        selectItemClassName
-                      )}
-                      key={index}
-                      value={item}
-                    >
-                      {item.label}
-                    </Select.Item>
-                  ))}
+                  <div className='h-[350px]'>
+                    {items.map((item, index) => (
+                      <Select.Item
+                        className={classNames(
+                          getTypographyClassNames('body3'),
+                          'flex items-center px-2 h-[40px] bg-white text-maim mb-1 cursor-pointer hover:border-transparent outline-none rounded-[3px] last:mb-0',
+                          'hover:bg-pink-light',
+                          selectItemClassName
+                        )}
+                        key={index}
+                        value={item}
+                      >
+                        {item.label}
+                      </Select.Item>
+                    ))}
+                    <h2 className={classNames(getTypographyClassNames('h2', 'border-b-1 border-gray-light'))}>Related Entities</h2>
+                    {relatedEntityList && relatedEntityList?.map((relatedEntity, index) => (
+                      <Select.Item
+                        className={classNames(
+                          getTypographyClassNames('body3'),
+                          'flex items-center px-2 h-[40px] bg-white text-maim mb-1 cursor-pointer hover:border-transparent outline-none rounded-[3px] last:mb-0',
+                          'hover:bg-pink-light',
+                          selectItemClassName
+                        )}
+                        key={index}
+                        value={relatedEntity.value}
+                      >
+                        {relatedEntity.label}
+                      </Select.Item>
+                    ))}
+                  </div>
                 </Select.Group>
               </ScrollArea.Viewport>
               <Select.Separator />
+              <ScrollArea.Scrollbar className="ScrollAreaScrollbar" orientation="vertical">
+                <ScrollArea.Thumb className="ScrollAreaThumb" />
+              </ScrollArea.Scrollbar>
             </ScrollArea.Root>
           </Select.Viewport>
           {/*<Select.ScrollDownButton />*/}

@@ -23,7 +23,7 @@ const Layout = ({ ContainerProps, children, hasOrderDetails }: LayoutProps) => {
       }
       />
       <main className="bg-background" {...ContainerProps}>
-        <div className="flex justify-center w-full">
+        <div className="w-full">
           {children}
         </div>
       </main>

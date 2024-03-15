@@ -1,4 +1,4 @@
-const db = {
+const schema = {
     "entities": [
         {
             "EntityId": "1",
@@ -2305,4 +2305,4 @@ const db = {
 
 }
 
-export { db }
+export { schema }
