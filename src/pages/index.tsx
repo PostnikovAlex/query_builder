@@ -6,12 +6,30 @@ import classNames from 'classnames'
 import { getTypographyClassNames } from '@/libs/typography'
 import { Dropdown } from '@/components/ui/Dropdown'
 import { useDispatch, useSelector } from 'react-redux';
-import { setEntity, setFields, setFieldOrRelatedEntity, addDummyField, setSelectedCondition, resetSelectedConfiguration } from '@/store/schemaSlice'
+import { setEntity, setFields, setFieldOrRelatedEntity, addDummyField, setSelectedCondition, resetSelectedConfiguration, setFieldValue } from '@/store/schemaSlice'
 
 const Main: NextPageWithLayout = () => {
 
   const dispatch = useDispatch();
   const { selectedEntity, selectedFields, entityList, relatedEntityList, columns } = useSelector((state) => state.schema);
+
+  const generateQueryString = () => {
+
+    const conditions = [];
+  
+    selectedFields.forEach((selectedField) => {
+      const { field, selectedCondition, value } = selectedField;
+      if (field && selectedCondition && value !== undefined && value !== null) {
+        const conditionString = `${field.ColumnName} ${selectedCondition.ConditionSymbol} '${value}'`;
+        conditions.push(conditionString);
+      }
+    });
+  
+    const queryString = `SELECT * FROM ${selectedEntity.EntityName} WHERE ${conditions.join(' AND ')}`;
+  
+    console.log('Generated query:', queryString);
+  };
+
   const handleEntityChange = (selectedEntity, RelatedEntityId) => {
     dispatch(resetSelectedConfiguration())
     dispatch(setEntity(selectedEntity, RelatedEntityId));
@@ -27,37 +45,73 @@ const Main: NextPageWithLayout = () => {
   const handleConditionChange = (condition, index) => {
     dispatch(setSelectedCondition({ condition, index }));
   };
+  useEffect(() => {
+    console.log(selectedFields)
+  }, [selectedFields])
 
-  const renderValueInputComponent = (field, index) => {
+  const renderValueInputComponent = (field, index, condition) => {
+    console.log(condition)
     const selectedField = selectedFields[index];
     const selectedCondition = selectedField.selectedCondition;
     if (!selectedCondition) return null;
     if (selectedCondition?.OperandCount == 0) {
       return null;
     }
-
+    const handleInputChange = (e, fieldIndex) => {
+      const { value } = e.target;
+      dispatch(setFieldValue({ value, index: fieldIndex }));
+    };
     const dataType = field.DataType.toLowerCase();
-    if (dataType.includes('nvarchar') || dataType === 'char') {
-      // Render text input with a maxLength
-      return <input type="text" maxLength={getMaxLengthFromDataType(dataType)} />;
-    } else if (dataType.includes('decimal') || dataType.includes('numeric')) {
-      // Render number input for decimal and numeric types
-      return <input type="number" step="any" />;
-    } else if (dataType.includes('date') || dataType.includes('time')) {
-      // Render datepicker for date and time types
-      return <input type="date" />;
-    } else if (dataType === 'bit') {
-      // Render dropdown with Yes and No options for bit type
+  if (condition.OperandCount == 2) {
+    // Render two inputs based on data type
+    if (dataType.includes("nvarchar") || dataType === "char") {
+      return (
+        <>
+          <input className={classNames('bg-transparent border-1 border-gray-light')} type="text" onChange={(e) => handleInputChange(e, index)} placeholder="First value" />
+          <input className={classNames('bg-transparent border-1 border-gray-light')} type="text" onChange={(e) => handleInputChange(e, index)} placeholder="Second value" />
+        </>
+      );
+    } else if (dataType.includes("decimal") || dataType.includes("numeric")) {
+      return (
+        <>
+          <input type="number" onChange={(e) => handleInputChange(e, index)} className={classNames('bg-transparent border-1 border-gray-light')} step="any" placeholder="First value" />
+          <input type="number" onChange={(e) => handleInputChange(e, index)} className={classNames('bg-transparent border-1 border-gray-light')} step="any" placeholder="Second value" />
+        </>
+      );
+    } else if (dataType.includes("date") || dataType.includes("time")) {
+      return (
+        <>
+          <input type="date" onChange={(e) => handleInputChange(e, index)} className={classNames('bg-transparent border-1 border-gray-light')} placeholder="First value" />
+          <input type="date" onChange={(e) => handleInputChange(e, index)} className={classNames('bg-transparent border-1 border-gray-light')} placeholder="Second value" />
+        </>
+      );
+    } else {
+      return (
+        <>
+          <input onChange={(e) => handleInputChange(e, index)} className={classNames('bg-transparent border-1 border-gray-light')} type="text" placeholder="First value" />
+          <input onChange={(e) => handleInputChange(e, index)} className={classNames('bg-transparent border-1 border-gray-light')} type="text" placeholder="Second value" />
+        </>
+      );
+    }
+  } else if (condition.OperandCount == 1) {
+    // Render single input based on data type
+    if (dataType.includes("nvarchar") || dataType === "char") {
+      return <input onChange={(e) => handleInputChange(e, index)} className={classNames('bg-transparent border-1 border-gray-light')} type="text" maxLength={getMaxLengthFromDataType(dataType)} />;
+    } else if (dataType.includes("decimal") || dataType.includes("numeric")) {
+      return <input onChange={(e) => handleInputChange(e, index)} className={classNames('bg-transparent border-1 border-gray-light')} type="number" step="any" />;
+    } else if (dataType.includes("date") || dataType.includes("time")) {
+      return <input onChange={(e) => handleInputChange(e, index)} className={classNames('bg-transparent border-1 border-gray-light')} type="date" />;
+    } else if (dataType === "bit") {
       return (
         <select>
-          <option value={true}>Yes</option>
-          <option value={false}>No</option>
+          <option className={classNames('bg-transparent border-1 border-gray-light')} value={true}>Yes</option>
+          <option className={classNames('bg-transparent border-1 border-gray-light')} value={false}>No</option>
         </select>
       );
     } else {
-      // For other types, render a text input as a fallback
-      return <input type="text" />;
+      return <input className={classNames('bg-transparent border-1 border-gray-light')} type="text" />;
     }
+  }
   };
 
   const getMaxLengthFromDataType = (dataType) => {
@@ -116,7 +170,7 @@ const Main: NextPageWithLayout = () => {
                   }))}
                   onValueChange={(value) => { handleConditionChange(value, index) }}
                 />}
-                {renderValueInputComponent(selectedField.field, index)}
+                {renderValueInputComponent(selectedField.field, index, selectedField.selectedCondition)}
               </div>
               
             </div>
@@ -124,7 +178,11 @@ const Main: NextPageWithLayout = () => {
           <button onClick={handleAddDummyField}>Add Field</button>
         </div>
       )}
+    <div className="flex items-center justify-center">
+      <button onClick={generateQueryString}>Generate Query</button>
     </div>
+    </div>
+
   )
 }
 

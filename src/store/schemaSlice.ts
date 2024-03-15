@@ -74,10 +74,14 @@ const schemaSlice = createSlice({
         state.selectedFields[index].selectedCondition = condition;
       },
       resetSelectedConfiguration(state) {
-        state.selectedFields = [{}]; // Reset to a single dummy field
+        state.selectedFields = [{}];
+      },
+      setFieldValue: (state, action) => {
+        const { value, index } = action.payload;
+        state.selectedFields[index].value = value;
       },
     },
   });
 
-export const { setEntity, setFieldOrRelatedEntity, addDummyField, setSelectedCondition, resetSelectedConfiguration } = schemaSlice.actions;
+export const { setEntity, setFieldOrRelatedEntity, addDummyField, setSelectedCondition, resetSelectedConfiguration, setFieldValue } = schemaSlice.actions;
 export default schemaSlice.reducer;
