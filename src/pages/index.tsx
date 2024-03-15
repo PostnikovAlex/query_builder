@@ -25,6 +25,7 @@ const Main: NextPageWithLayout = () => {
       }
     });
   
+    // Create the final query string by joining all conditions with 'AND'
     const queryString = `SELECT * FROM ${selectedEntity.EntityName} WHERE ${conditions.join(' AND ')}`;
   
     console.log('Generated query:', queryString);
