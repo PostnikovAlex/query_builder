@@ -46,12 +46,8 @@ const Main: NextPageWithLayout = () => {
   const handleConditionChange = (condition, index) => {
     dispatch(setSelectedCondition({ condition, index }));
   };
-  useEffect(() => {
-    console.log(selectedFields)
-  }, [selectedFields])
 
   const renderValueInputComponent = (field, index, condition) => {
-    console.log(condition)
     const selectedField = selectedFields[index];
     const selectedCondition = selectedField.selectedCondition;
     if (!selectedCondition) return null;
